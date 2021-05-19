@@ -152,7 +152,7 @@ public class Aldeao extends Thread{
 		}
 		
 		if(this.construcao == "Templo"){
-			if(this.vila.verificaEPaga(2000, 2000, 0) && this.vila.getTemplo() == null)
+			if(this.vila.verificaEPaga(000, 000, 0) && this.vila.getTemplo() == null)
 			construirTemplo();
 		}
 		
@@ -195,7 +195,7 @@ public class Aldeao extends Thread{
 	private void construirTemplo() {
 		try {
 			if(this.vila.getTemplo() == null){
-				Thread.sleep(100000);
+				Thread.sleep(00000);
 				System.out.println("Pode ser habilitado!");
 				Templo templo = new Templo(this.vila, this.principal);
 				this.vila.setTemplo(templo);

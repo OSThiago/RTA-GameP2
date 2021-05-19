@@ -44,8 +44,12 @@ import Classes.AcaoAldeao;
 import Classes.AcaoPrefeitura;
 import Classes.AcaoTemplo;
 import Classes.Aldeao;
+import Classes.ClienteTCP;
+import Classes.ClienteTeste2;
 import Classes.Jogador;
 import Classes.ServidorTCP;
+import Classes.ServidorTCP2;
+import Classes.ServidorTeste;
 import tela.enumerador.SituacaoInicio;
 
 public class Principal extends JFrame {
@@ -103,6 +107,9 @@ public class Principal extends JFrame {
 	private JProgressBar pbMaravilha;
 	
 	private Jogador jogador;
+	//private ServidorTCP servidor;
+	private ServidorTeste servidor;
+	private ClienteTCP cliente;
 	
 	public static void main(String[] args) {
 		Principal principal = new Principal();
@@ -796,7 +803,7 @@ public class Principal extends JFrame {
 			this.lblMensagem.setEnabled(true);
 			this.tfMensagem.setEnabled(true);
 			this.btnEnviar.setEnabled(true);
-			this.tpJogo.setEnabledAt(1, true);
+			this.tpJogo.setEnabledAt(1, false); //----------------------------
 		}
 	}
 
@@ -927,7 +934,6 @@ public class Principal extends JFrame {
 
 	private void comandoCriarJogo(String nome, String civilizacao) {
 		boolean retorno;
-		//String ip = "100.200.300.400";
 		String ipMaquina;
 		
 		
@@ -943,32 +949,61 @@ public class Principal extends JFrame {
 				destruirJogador();
 			}
 
-			this.jogador = new Jogador(nome, civilizacao, this);
+			
 			//System.out.println("Jogador criado NOME - " + this.jogador.getNomeJogador() + " civilizacao - " + this.jogador.getCivilizacao());
 			
-			
-			// --------------- teste -------------------------		
+					
 			try {
 				ipMaquina = InetAddress.getByName("localhost").getHostAddress();
 				
+				
+			// -------------------------------------------------------------	
 				this.adicionarJogador(nome, civilizacao, ipMaquina, "aguardando jogadores...");
+					
+				
 				this.situacaoInicio = SituacaoInicio.CRIAR_CRIADO;
 				this.habilitarInicio();
 			
-				ServidorTCP servidorTCP = new ServidorTCP(this);
+//				ServidorTCP servidorTCP = new ServidorTCP(this);
+//				servidorTCP.setSituacao(SituacaoInicio.INICIAL_CONECTAR);
+//				servidorTCP.start();
+				
+				//ServidorTeste servidor = new ServidorTeste();
+				//this.servidor = servidor;
+				//servidor.start();
+				
+				
+				ServidorTCP2 servidorTCP = new ServidorTCP2(this);
 				servidorTCP.setSituacao(SituacaoInicio.INICIAL_CONECTAR);
 				servidorTCP.start();
-					
-				this.jogador.conectar(ipMaquina, nome);
+				
+				
+				
+				
+				//this.servidor = servidorTCP;
+				this.jogador = new Jogador(nome, civilizacao, ipMaquina, this);
+//				this.cliente = new ClienteTCP(this, this.jogador);
+//				this.cliente.criarServidor(ipMaquina);
+				
+				//this.cliente.conectar(ipMaquina, this.jogador);
+				
+				ClienteTeste2 cliente = new ClienteTeste2(this, this.jogador);
+				cliente.conectar(ipMaquina);
+				
+				
+				
 				
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}		
 			
 		}
 	}
 
+	public Jogador getJogador() {
+		return this.jogador;
+	}
+	
 	private void comandoDestruirJogo() {
 		destruirJogador();
 		this.limparJogadores();
@@ -978,11 +1013,11 @@ public class Principal extends JFrame {
 	}
 	
 	private void destruirJogador() {
-		this.jogador.setVivo(false);
-		this.jogador = null;
+		this.cliente.setOuvindo(false);
+		this.cliente = null;
 	}
 	
-	private void comandoIniciarJogo() {
+	public void comandoIniciarJogo() {
 		boolean retorno = true; // retorno da iniciação do jogo
 		if (retorno) {
 			this.situacaoInicio = SituacaoInicio.CRIAR_INICIADO;
@@ -1015,12 +1050,13 @@ public class Principal extends JFrame {
 			this.adicionarJogador(nome, civilizacao, ipServidor, "aguardando iniciar...");
 			this.situacaoInicio = SituacaoInicio.CONECTADO;
 			this.habilitarInicio();
-			this.tpJogo.setSelectedIndex(1);
+			this.tpJogo.setSelectedIndex(0);
 			
-			//Adiconar jogador 
-			this.jogador = new Jogador(nome, civilizacao, this);
+			//Adicionar jogador 
+			this.jogador = new Jogador(nome, civilizacao, ipServidor, this);
+			this.cliente = new ClienteTCP(this, this.jogador);
+			this.cliente.conectar(ipServidor, this.jogador);
 			
-			this.jogador.conectar(ipServidor, nome);
 			
 		}
 	}
@@ -1036,7 +1072,7 @@ public class Principal extends JFrame {
 		
 		System.out.println("Mensagem escrita: "+ mensagem);
 		this.tfMensagem.setText("");
-		this.jogador.enviarMensagem(mensagem);
+		this.cliente.enviarMensagem(mensagem);
 		
 	}
 	

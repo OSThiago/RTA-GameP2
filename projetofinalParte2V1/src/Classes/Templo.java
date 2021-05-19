@@ -98,7 +98,7 @@ public class Templo extends Thread{
 	}
 	
 	public void evoluirNuvem(){
-		int precoOferenda = 10000;
+		int precoOferenda = 0000;
 		
 		if(!verificaPreco(precoOferenda)) {
 			return;
@@ -110,7 +110,7 @@ public class Templo extends Thread{
 		
 		try {
 			this.vila.getPrefeitura().retirarOferenda(precoOferenda);
-			Thread.sleep(50000);
+			Thread.sleep(0000);
 			this.evolucoes.add("NUVEM_GAFANHOTOS");
 			this.principal.mostrarAtaques(this.evolucoes);
 		} catch (InterruptedException e) {
@@ -253,6 +253,32 @@ public class Templo extends Thread{
 	
 	public void setQualEvolucao(String evolucao) {
 		this.qualEvolucao = evolucao;
+	}
+	
+	
+	//-------------------------------------------------------
+	public void lancarAtaque(String ataque) {
+		if(ataque.equals("Nuvem de gafanhotos")){
+			
+		}
+		
+		if(ataque.equals("Morte dos primogênitos")){
+		}
+		
+		if(ataque.equals("Chuva de pedras")){
+		}
+	}
+	
+	public void ataqueNuvem(){
+		
+	}
+	
+	public void ataqueMorte(){
+		
+	}
+	
+	public void ataqueChuva(){
+		
 	}
 	
 }

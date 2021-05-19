@@ -24,21 +24,26 @@ public class ServidorTCP extends Thread{
 	private SituacaoInicio situacao;
 	private boolean vivo;
 	private Principal principal;
+	private List<Jogador> jogadores;
+	
 	
 	//Construtor
-	public ServidorTCP(Socket conexao, List<ObjectOutputStream> saidas, Principal principal) {
+	public ServidorTCP(Socket conexao, List<ObjectOutputStream> saidas, Principal principal/*, List<Jogador> jogadores*/) {
 		System.out.println("Cliente conectado: "+ conexao.getInetAddress().getHostAddress());
 		this.conexao = conexao;
 		this.saidas = saidas;
 		this.vivo = true;
 		this.situacao = SituacaoInicio.INICIAL_CRIAR;
 		this.principal = principal;
+		//this.jogadores = jogadores;
+		
 	}
 	
 	public ServidorTCP(Principal principal) {
 		this.vivo = true;
 		this.situacao = SituacaoInicio.INICIAL_CRIAR;
 		this.principal = principal;
+		//this.jogadores = new ArrayList<Jogador>();
 	}
 	
 	//Metodos
@@ -61,7 +66,7 @@ public class ServidorTCP extends Thread{
 	
 	
 	private void conectado() {
-		System.out.println("entrou no na funcao conectado");
+		System.out.println("entrou na funcao conectado");
 		DateFormat horaMinuto = new SimpleDateFormat("HH:mm");
 		try {
 			ObjectInputStream entrada = new ObjectInputStream(this.conexao.getInputStream());
@@ -74,16 +79,28 @@ public class ServidorTCP extends Thread{
 			super.setName(mensagem);
 			
 			
+		
+			
 			
 			try{
 				while(!(mensagem = (String) entrada.readObject()).equals("COMANDO SAIR SERVIDOR")){
+					
+					
+					
 					synchronized(this.saidas){
+						//System.out.println("--------->" + mensagem);
 						String msg = super.getName()+"("+horaMinuto.format(new Date())+"): "+mensagem;
-						this.principal.adicionarMensagem(msg);
 						
-						for(ObjectOutputStream enviarMsg : this.saidas){
-							enviarMsg.writeObject(msg);
+						if(verificaMensagem(mensagem)) {
+							System.out.println("é uma ataque");
+						}else {
+							for(ObjectOutputStream enviarMsg : this.saidas){
+								enviarMsg.writeObject(msg);
 						}
+										
+						
+						}
+						
 					}
 				}
 			}catch(SocketException e){}
@@ -131,6 +148,50 @@ public class ServidorTCP extends Thread{
 	public void setSituacao(SituacaoInicio situacao) {
 		this.situacao = situacao;
 	}
+	
+	
+	private boolean verificaMensagem(String mensagem) {
+		
+		if(mensagem.equals("ataque")) {
+			System.out.println("Entrou no ataque");
+			return true;
+		}
+		
+		
+		return false;
+	}
+	
+	public boolean verificaObjeto(String mensagem, Object entrada) {
+		System.out.println("Entrou na funcao verificaObjeto");
+
+		if(mensagem.equals("jogador")) {
+			this.jogadores.add((Jogador) entrada);
+			
+			
+		}
+		
+		return false;
+	}
+
+	public void writeObject(String mensagem, Object entrada) {
+		
+		
+		
+	}
+
+	
+	
+	
+	
+	
+//	public void adicionarList(Jogador jogador) {
+//		//this.jogadores.add(jogador);
+//	}
+
+//	public List<Jogador> getJogadores() {
+//		return jogadores;
+//	}
+	
 	
 	
 }
